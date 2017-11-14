@@ -8,3 +8,5 @@ pandas
 pillow
 h5py
 Flask-JSGlue
+requests
+Flask-API

@@ -6,11 +6,14 @@ from web import settings
 from web import app
 from flask import render_template, redirect, flash, url_for, request
 from werkzeug import secure_filename
+import requests, json
 
 APP_ROOT = path.dirname(path.abspath(__file__))
 ALLOWED_EXTENSIONS = set(['csv', 'xls', 'xlsx'])
 UPLOAD_FOLDER = path.join(APP_ROOT, 'csv/')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+LABEL_FOLDER = path.join(APP_ROOT, 'label/')
+app.config['LABEL_FOLDER'] = LABEL_FOLDER
 
 
 
@@ -81,21 +84,31 @@ def upload():
     return render_template('loadFiles.html', file_names=file_names)
 
 
-@app.route('/grabjson', methods=['POST'])
-def grabjson():
+@app.route('/grapjson',methods=['GET','POST'])
+def grapjson():
+    #get data from jqury and convet JSON into dict
+    data = json.loads(request.get_data())
 
-    print('hello')
+    #delete label folder
+    if os.path.exists(app.config['LABEL_FOLDER']):
+        shutil.rmtree(app.config['LABEL_FOLDER'])
 
-    # converts the JSON object into Python recognizable data
-    req_data = request.get_json()
+    #make a new label folder
+    os.mkdir(app.config['LABEL_FOLDER'])
 
-    fileName_label = req_data['file_name']['label'][0]
+    for key, value in data.items():
+        temp_label = value['label']
+        temp_filename = value['file_name']
+        label_path = os.path.join(app.config['LABEL_FOLDER'], temp_label)
+        if os.path.exists(label_path)==False:
+            os.makedirs(label_path)
 
-    for row in fileName_label:
-        print(row)
+        #move from csv to files
+        prefile_path = os.path.join(app.config['UPLOAD_FOLDER'], temp_filename)
+        shutil.move(prefile_path, os.path.join(label_path, temp_filename))
 
-
-    return 'helllllo'
+    #flash("hhhhhhhhhh")
+    return render_template('transformData.html')
 
 
 @app.route('/alerts', methods=['POST'])
