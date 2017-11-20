@@ -130,13 +130,13 @@
 <body>
   <div class="container z-depth-2" style="height: 100%;">
 
-
+{% if active_page=='home' %}
   <div id="jumbotron" style="width: 100% !important; height: 25%; background-color: #173645 !important; display: flex; align-items: center; color: white; font-size: 1.3em; font-weight: lighter;">
     <div class="container">
       <h2 class="center-align">TimeChange</h2>
     </div>
   </div>
-
+{% endif %}
 
   {% block content %}{% endblock %}
 </div>
